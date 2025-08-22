@@ -5,6 +5,7 @@ import ProyectoModulo.AndreeOrellana_20240012.Models.DTOLibros;
 import ProyectoModulo.AndreeOrellana_20240012.Repositories.repositoryLibro;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class serviceLibros {
             throw new IllegalArgumentException("No pueden haber campos vacios");
         }
         try{
-            EntityLibro libro = objRepoL.save(convertToEA(dtoL));
+            EntityLibro libro = objRepoL.save(convertToEL(dtoL));
             return convertToDTOL(libro);
         }catch (Exception e){
             throw new IllegalArgumentException();
@@ -36,6 +37,48 @@ public class serviceLibros {
         }
         EntityLibro libroExist = objRepoL.findById(id).orElseThrow(() -> new EntityNotFoundException("Libro no encontrado con id: " + id));
 
-        libroExist.setLibroName(dtoL.getId())
+        libroExist.setId(dtoL.getId());
+        libroExist.setTitulo(dtoL.getTitulo());
+
+        EntityLibro libro = objRepoL.save(libroExist);
+        return convertToDTOL(libro);
+    }
+
+    public boolean removeArea(String id){
+        try{
+            if (id == null || id.trim().isEmpty()){
+                throw new IllegalArgumentException("El id del Libro no puede ser nulo o vacio");
+            }
+            objRepoL.deleteById(id);
+            return true;
+        }catch (EmptyResultDataAccessException e){
+            throw new EntityNotFoundException("No se encontro el libro");
+        }
+    }
+
+    private DTOLibros convertToDTOL(EntityLibro libro){
+        DTOLibros dtoL = new DTOLibros();
+        dtoL.setId(libro.getId());
+        dtoL.setTitulo(libro.getTitulo());
+        dtoL.setIsbn(libro.getIsbn());
+        dtoL.setAño_publicacion(libro.getAño_publicacion());
+        dtoL.setGenero(libro.getGenero());
+        dtoL.setAutores_id(libro.getAutores_id());
+        return dtoL;
+    }
+
+    private EntityLibro convertToEL(DTOLibros dtoL){
+        EntityLibro libro = new EntityLibro();
+        dtoL.setId(libro.getId());
+        dtoL.setTitulo(libro.getTitulo());
+        dtoL.setIsbn(libro.getIsbn());
+        dtoL.setAño_publicacion(libro.getAño_publicacion());
+        dtoL.setGenero(libro.getGenero());
+        dtoL.setAutores_id(libro.getAutores_id());
+        return libro;
+    }
+
+    public DTOLibros postArea(DTOLibros dto) {
+        return null;
     }
 }

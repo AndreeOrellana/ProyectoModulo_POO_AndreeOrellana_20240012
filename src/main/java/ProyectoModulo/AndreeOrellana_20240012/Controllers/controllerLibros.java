@@ -10,8 +10,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @RestController
 @RequestMapping("/apiLibros")
@@ -23,7 +26,7 @@ public class librosController {
 
     @GetMapping("/getLibro")
     public List<DTOLibros> getLibros(){
-        return objServiceL getLibros();
+        return objServiceL.getLibros();
     }
 
     /*SOLICITUD POST*/
@@ -31,7 +34,7 @@ public class librosController {
     @PostMapping("/postLibro")
     public ResponseEntity<?> postArea(@RequestBody DTOLibros dto){
         try {
-            DTOLibros answer = objServiceL.postArea(dto);
+            DTOLibros answer = objServiceL.postLibro(dto);
             if (answer == null) {
                 return ResponseEntity.badRequest().body(Map.of(
                         "status", "Error al guardar los datos",
@@ -54,34 +57,7 @@ public class librosController {
 
     /*SOLICITUD PUT*/
 
-    @PutMapping("/putLibro/{id}")
-    public ResponseEntity<?> putLibro (@Validated @RequestBody DTOLibros dto @PathVariable String id BindingResult dataResult){
-        if (dataResult.hasErrors()){
-            Map<String, String> errors = new HashMap<>();
-            dataResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.badRequest().body(errors);
-        }
-        try{
-            DTOLibros answer = objServiceL.putLibro(dto, id);
-            if (answer == null) {
-                return ResponseEntity.badRequest().body(Map.of(
-                        "status", "Error al actualizar los datos",
-                        "errorType", "VALIDATION_ERROR",
-                        "message", "Datos inválidos, vuelva a intentarlo"
-                ));
-            }
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                    "status", "Libro modificado correctamente, Success",
-                    "data", answer
-            ));
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "status", "Error critico no controlado",
-                    "message", "Error al actualizar el libro",
-                    "detail", e.getMessage()
-            ));
-        }
-    }
+    
 
     /*SOLICITUD DELETE*/
 

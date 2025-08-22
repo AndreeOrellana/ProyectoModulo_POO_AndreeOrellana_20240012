@@ -17,7 +17,10 @@ public class DTOLibros {
     @NotBlank
     private String isbn;
 
-    private Integer ano_publicacion;
-    
+    private Long año_publicacion;
+
+    private String genero;
+
+    private Long autores_id;
 
 }
